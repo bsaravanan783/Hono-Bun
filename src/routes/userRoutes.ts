@@ -28,7 +28,6 @@ userRoute.post('/create' , async(c)=> {
 //     const { name, email, rollno, phoneNumber } : UserInterface = await c.req.json();
 // })
 
-
 userRoute.get('/destinations/all' , async (c) => {
     const destinations = await prisma.destination.findMany({
         where : {isAvailable : true }
@@ -47,12 +46,27 @@ userRoute.get('/destinations/:id' , async (c) => {
     return c.json(destination);
 });
 
-
 userRoute.get('/content' , async (c) => {
     const content = await prisma.displayContent.findFirst({
         where : { isActive : true }
     });
     return c.json(content);
+});
+
+userRoute.get("/bookings" , async (c) => {
+    const bookings = await prisma.booking.findMany({
+        where : { userId : c.get('user').id }
+    });
+    return c.json(bookings);
+})
+
+userRoute.get("/bookings/:id" , async (c) => {
+    const bookingId = c.req.param('id');
+    const booking = await prisma.booking.findFirst({
+        where : { id : parseInt(bookingId) , userId : c.get('user').id }
+    });
+
+    return c.json(booking);
 });
 
 export default userRoute;

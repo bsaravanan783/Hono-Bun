@@ -1,7 +1,6 @@
-import {Hono } from 'hono';
+import { Hono } from 'hono';
 import { adminInterface, contentInterface, destinationInterface } from '../interfaces/admin';
 import { prisma } from '..';
-import { parse } from 'dotenv';
 
 const adminRouter = new Hono();
 
@@ -30,12 +29,32 @@ adminRouter.post("/create-destination" , async (c) => {
 
 });
 
+adminRouter.delete("delete-destination/:id" , async (c) => {
+    const id = c.req.param('id');
+    await prisma.destination.delete({
+        where : {
+            id  : parseInt(id)
+        }
+    });
+    return c.json({ message : 'Destination deleted successfully' } , 200 );
+});
+
 adminRouter.post('/create-content' , async (c) => {
     const contenObj : contentInterface = await c.req.json();
     await prisma.displayContent.create({ data : contenObj });
     return c.json({ message : 'Content created successfully' } , 200 );
 });
 
+adminRouter.delete('/delete-content/:id' , async (c) => {
+    const id = c.req.param('id');
+    await prisma.displayContent.delete({
+        where : {
+            id : parseInt(id)
+        }   
+    });
+
+    return c.json({ message : 'Content deleted successfully' } , 200 );
+});
 
 
 export default adminRouter;
